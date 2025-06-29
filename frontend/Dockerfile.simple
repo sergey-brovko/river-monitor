@@ -1,0 +1,26 @@
+# frontend/Dockerfile.simple - Простая версия для отладки
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Копируем package files
+COPY package*.json ./
+
+# Устанавливаем зависимости
+RUN npm install
+
+# Копируем исходный код
+COPY . .
+
+# Переменные окружения
+ENV REACT_APP_API_URL=http://localhost:8000
+
+# Открываем порт
+EXPOSE 3000
+
+# Проверка здоровья (простая)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+
+# Команда запуска в режиме разработки
+CMD ["npm", "start"]
